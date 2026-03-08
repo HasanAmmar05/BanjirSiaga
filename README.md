@@ -32,20 +32,20 @@
 
 ---
 
-## 🚨 The Problem
+## 🚨 The Challenge
 
-Malaysia faces a devastating flood crisis that current systems fail to address:
+Malaysia faces complex flooding scenarios that require increasingly advanced technological solutions to manage:
 
-| Metric | Value | Impact |
-|--------|-------|--------|
-| 💰 Government spend on flood warnings | **RM 145 Million** | Massive investment, minimal returns |
-| 📉 Existing forecast accuracy | **5.6%** | Practically useless for life-saving decisions |
-| 🙈 Population unaware of active warnings | **69.8%** | Warnings exist but never reach the people |
-| 🏘️ States affected by annual flooding | **All 16** | A nationwide crisis, not a regional one |
+| Metric | Challenge | Impact |
+|--------|-----------|--------|
+| 🌦️ Rapid Weather Changes | **Unpredictable** | Flash floods can occur with minimal warning signs |
+| 📉 Forecast Granularity | **Often Broad** | State-level alerts may not reflect street-level reality |
+| 🙈 Information Overload | **Reachability** | Critical alerts must compete with daily digital noise |
+| 🏘️ Nationwide Scope | **All 16 States** | A crisis that affects the entire country |
 
-> **The December 2021 KL flood** displaced **over 125,000 people** and caused **RM 6.1 billion** in damages. In Taman Sri Muda, Shah Alam, floodwater reached **3 meters** — engulfing entire homes. The government's warning system gave **zero advance notice**.
+> **The December 2021 KL flood** displaced **over 125,000 people** and caused **RM 6.1 billion** in damages. In areas like Taman Sri Muda, rapid water level rises engulfed entire homes in a matter of hours.
 
-**BanjirSiaga exists because the gap between RM 145M in infrastructure and 5.6% accuracy is measured in human lives.**
+**BanjirSiaga exists to complement existing early-warning infrastructure by bringing real-time, AI-driven contextual insights directly to the people.**
 
 ---
 
@@ -82,13 +82,12 @@ BanjirSiaga fuses **real-time multi-source data** with **Gemini 2.0 Flash AI rea
 
 ### What Makes Us Different
 
-| Feature | Government System | BanjirSiaga |
-|---------|-------------------|-------------|
-| Accuracy | 5.6% | **AI-powered contextual reasoning** |
-| Granularity | State-level | **Street-level (postcode/GPS)** |
-| Language | English only | **Bilingual BM + EN** |
-| Speed | Hours delay | **Real-time (< 5 seconds)** |
-| Accessibility | SMS/official portals | **Mobile-first web app** |
+| Feature | Traditional Systems | BanjirSiaga |
+|---------|---------------------|-------------|
+| Analysis | Broad meteorological models | **AI-powered contextual, multi-source reasoning** |
+| Granularity | State or district level | **Street-level (postcode/GPS)** |
+| Language | Standard official broadcasts | **Bilingual conversational BM + EN** |
+| Delivery | Portals or scheduled updates | **Instant, mobile-first web app** |
 | Photo Analysis | ❌ | ✅ **Gemini Vision flood depth estimation** |
 | Historical Context | ❌ | ✅ **Local flood history integration** |
 
@@ -224,12 +223,12 @@ Flood history database includes high-risk zones across the Klang Valley:
 
 ## 🛡️ Resilience Design
 
-BanjirSiaga is built for the worst moments — when infrastructure fails and connectivity drops:
+BanjirSiaga is built for the worst moments — when infrastructure faces extreme load and connectivity is limited:
 
 - **Model Cascade**: 3-tier Gemini failover with intelligent retry and backoff
 - **Rule-Based Fallback**: When ALL AI models fail, a deterministic rule engine provides assessments using PRD-defined thresholds — ensuring **zero downtime**
 - **Photo Fallback**: Realistic randomized photo analyses when Vision API is unavailable
-- **Graceful Degradation**: Government warning API failures are silently handled — Open-Meteo data alone is sufficient for accurate assessments
+- **Graceful Degradation**: External API connection issues are silently handled — Open-Meteo data alone is sufficient for accurate assessments
 
 ---
 

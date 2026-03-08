@@ -4,3 +4,7 @@ google-genai
 httpx
 python-multipart
 python-dotenv
+supabase
+pydantic-settings
+tenacity
+slowapi

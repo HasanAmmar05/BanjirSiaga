@@ -1,0 +1,285 @@
+:root {
+            --bg-primary: #0a0e1a;
+            --bg-card: rgba(14, 20, 36, 0.7);
+            --bg-card-solid: #0e1424;
+            --border: rgba(148, 163, 184, 0.08);
+            --border-hover: rgba(148, 163, 184, 0.15);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-teal: #2dd4bf;
+            --accent-blue: #38bdf8;
+            --accent-amber: #fbbf24;
+            --accent-red: #f87171;
+            --accent-green: #4ade80;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* ─── Topographic Background ─── */
+        .topo-bg {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 200 Q100 150 200 200 T400 200' fill='none' stroke='%2338bdf8' stroke-width='1'/%3E%3Cpath d='M0 180 Q120 130 200 180 T400 180' fill='none' stroke='%2338bdf8' stroke-width='0.5'/%3E%3Cpath d='M0 220 Q80 170 200 220 T400 220' fill='none' stroke='%2338bdf8' stroke-width='0.5'/%3E%3Cpath d='M0 100 Q100 50 200 100 T400 100' fill='none' stroke='%232dd4bf' stroke-width='0.8'/%3E%3Cpath d='M0 300 Q100 250 200 300 T400 300' fill='none' stroke='%232dd4bf' stroke-width='0.8'/%3E%3C/svg%3E");
+            background-size: 400px 400px;
+        }
+
+        /* ─── Ambient Light ─── */
+        .ambient {
+            position: fixed; z-index: 0; pointer-events: none;
+            border-radius: 50%;
+            filter: blur(150px);
+        }
+        .ambient-1 { width: 500px; height: 500px; background: rgba(45,212,191,0.06); top: -150px; right: -100px; }
+        .ambient-2 { width: 400px; height: 400px; background: rgba(56,189,248,0.04); bottom: -100px; left: -100px; }
+
+        /* ─── Water Ripple Canvas ─── */
+        #ripple-canvas {
+            position: fixed; inset: 0; z-index: 0;
+            pointer-events: none; opacity: 0.15;
+        }
+
+        /* ─── Cards ─── */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px) saturate(1.2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card:hover {
+            border-color: var(--border-hover);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        .card-solid {
+            background: var(--bg-card-solid);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+        }
+
+        /* ─── Typography ─── */
+        .display { font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
+        .heading { font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+        .label { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); }
+
+        /* ─── Accent Line ─── */
+        .accent-line {
+            width: 40px; height: 3px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-blue));
+            border-radius: 2px;
+        }
+
+        /* ─── Buttons ─── */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-blue));
+            color: #0a0e1a;
+            font-weight: 700;
+            padding: 14px 32px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-size: 0.9375rem;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(45,212,191,0.25); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 0.8125rem;
+            transition: all 0.2s;
+        }
+        .btn-secondary:hover { border-color: var(--border-hover); background: rgba(255,255,255,0.02); }
+
+        /* ─── Risk Levels ─── */
+        .risk-safe { background: linear-gradient(135deg, #065f46, #059669); }
+        .risk-warn { background: linear-gradient(135deg, #92400e, #d97706); }
+        .risk-danger {
+            background: linear-gradient(135deg, #991b1b, #dc2626);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(220,38,38,0.2); }
+            50% { box-shadow: 0 0 40px rgba(220,38,38,0.4); }
+        }
+
+        /* ─── Status Chip ─── */
+        .chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .chip-live {
+            background: rgba(45,212,191,0.1);
+            border: 1px solid rgba(45,212,191,0.2);
+            color: var(--accent-teal);
+        }
+        .chip-replay {
+            background: rgba(251,191,36,0.1);
+            border: 1px solid rgba(251,191,36,0.2);
+            color: var(--accent-amber);
+        }
+
+        /* ─── Loading ─── */
+        .loader-bar {
+            height: 2px; background: var(--border); border-radius: 1px; overflow: hidden;
+        }
+        .loader-bar-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-blue));
+            transition: width 0.8s ease;
+            border-radius: 1px;
+        }
+
+        /* ─── Screen transitions ─── */
+        .screen { display: none; }
+        .screen.active { display: block; animation: screenIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes screenIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Map ─── */
+        #map { border-radius: var(--radius); z-index: 5; }
+        .leaflet-container { background: var(--bg-primary) !important; }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.15); border-radius: 3px; }
+
+        /* ─── Drop zone ─── */
+        .drop-zone {
+            border: 1.5px dashed rgba(148,163,184,0.15);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--accent-teal);
+            background: rgba(45,212,191,0.03);
+        }
+
+        /* ─── Replay badge ─── */
+        .replay-badge {
+            position: fixed; top: 16px; right: 16px; z-index: 100;
+            display: none;
+        }
+        .replay-badge.visible { display: block; }
+
+        /* ─── Data Metric ─── */
+        .metric { text-align: center; }
+        .metric-value { font-size: 1.75rem; font-weight: 800; letter-spacing: -0.02em; }
+        .metric-label { font-size: 0.6875rem; color: var(--text-muted); margin-top: 2px; letter-spacing: 0.02em; }
+
+        /* ─── Section divider ─── */
+        .divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+        /* ─── Evac card ─── */
+        .evac-card {
+            position: relative;
+            padding-left: 20px;
+        }
+        .evac-card::before {
+            content: '';
+            position: absolute; left: 0; top: 8px;
+            width: 6px; height: 6px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(248,113,113,0.5);
+        }
+
+        /* ─── Containers ─── */
+        .container { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+        .container-wide { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+        /* ─── Feature Grid ─── */
+        .feature-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.125rem;
+            flex-shrink: 0;
+        }
+
+        /* ─── Toggle ─── */
+        .toggle-track {
+            width: 44px; height: 24px;
+            border-radius: 12px;
+            background: rgba(148,163,184,0.15);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            border: 1px solid var(--border);
+        }
+        .toggle-track.active {
+            background: rgba(251,191,36,0.2);
+            border-color: rgba(251,191,36,0.3);
+        }
+        .toggle-dot {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            position: absolute; top: 2px; left: 2px;
+            transition: all 0.3s;
+        }
+        .toggle-track.active .toggle-dot {
+            left: 22px;
+            background: var(--accent-amber);
+        }
+
+        /* ─── Progress Steps ─── */
+        .step-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            transition: all 0.4s;
+        }
+        .step-item.active { border-color: rgba(45,212,191,0.3); background: rgba(45,212,191,0.03); }
+        .step-item.done { border-color: rgba(74,222,128,0.2); }
+        .step-num {
+            width: 28px; height: 28px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700;
+            background: rgba(148,163,184,0.1);
+            color: var(--text-muted);
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        .step-item.active .step-num { background: rgba(45,212,191,0.15); color: var(--accent-teal); }
+        .step-item.done .step-num { background: rgba(74,222,128,0.15); color: var(--accent-green); }
+
+        /* ─── Quick Action Pills ─── */
+        .pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }

@@ -1,0 +1,107 @@
+[
+  {
+    "name": "Dewan Komuniti Wangsa Maju",
+    "lat": 3.1920,
+    "lon": 101.7380,
+    "capacity": 500,
+    "address": "Jalan Wangsa Delima 12, Wangsa Maju, 53300 KL"
+  },
+  {
+    "name": "SK Wangsa Maju Seksyen 2",
+    "lat": 3.1895,
+    "lon": 101.7355,
+    "capacity": 300,
+    "address": "Jalan Wangsa Delima 5, Wangsa Maju, 53300 KL"
+  },
+  {
+    "name": "Dewan Serbaguna Ampang",
+    "lat": 3.1480,
+    "lon": 101.7610,
+    "capacity": 800,
+    "address": "Jalan Ampang, 68000 Ampang, Selangor"
+  },
+  {
+    "name": "Masjid Jamek Ampang",
+    "lat": 3.1510,
+    "lon": 101.7580,
+    "capacity": 400,
+    "address": "Jalan Ampang Jaya, 68000 Ampang"
+  },
+  {
+    "name": "Dewan Komuniti Setapak",
+    "lat": 3.1870,
+    "lon": 101.7190,
+    "capacity": 350,
+    "address": "Jalan Genting Kelang, 53100 Setapak, KL"
+  },
+  {
+    "name": "SK Danau Kota",
+    "lat": 3.1940,
+    "lon": 101.7240,
+    "capacity": 250,
+    "address": "Taman Danau Kota, 53300 Setapak, KL"
+  },
+  {
+    "name": "Dewan MBSA Shah Alam",
+    "lat": 3.0733,
+    "lon": 101.5185,
+    "capacity": 1200,
+    "address": "Persiaran Perbandaran, Seksyen 14, 40000 Shah Alam"
+  },
+  {
+    "name": "Dewan Komuniti Seksyen 24 Shah Alam",
+    "lat": 3.0515,
+    "lon": 101.5340,
+    "capacity": 600,
+    "address": "Seksyen 24, 40300 Shah Alam, Selangor"
+  },
+  {
+    "name": "SK Taman Kosas Ampang",
+    "lat": 3.1420,
+    "lon": 101.7650,
+    "capacity": 400,
+    "address": "Taman Kosas, 68000 Ampang, Selangor"
+  },
+  {
+    "name": "Dewan Serbaguna Pandan Indah",
+    "lat": 3.1290,
+    "lon": 101.7530,
+    "capacity": 500,
+    "address": "Jalan Pandan Indah 1, 55100 KL"
+  },
+  {
+    "name": "Balai Raya Cheras",
+    "lat": 3.1080,
+    "lon": 101.7320,
+    "capacity": 350,
+    "address": "Taman Midah, 56000 Cheras, KL"
+  },
+  {
+    "name": "Dewan MPAJ Ampang Jaya",
+    "lat": 3.1560,
+    "lon": 101.7700,
+    "capacity": 1000,
+    "address": "Jalan Pandan Utama, 55100 Ampang Jaya, Selangor"
+  },
+  {
+    "name": "SK Petaling Jaya SS2",
+    "lat": 3.1160,
+    "lon": 101.6270,
+    "capacity": 300,
+    "address": "SS2/72, Petaling Jaya, 47300 Selangor"
+  },
+  {
+    "name": "Dewan Komuniti Bukit Jalil",
+    "lat": 3.0583,
+    "lon": 101.6910,
+    "capacity": 400,
+    "address": "Jalan Jalil Perkasa, 57000 Bukit Jalil, KL"
+  },
+  {
+    "name": "Masjid Wilayah Persekutuan",
+    "lat": 3.1715,
+    "lon": 101.6935,
+    "capacity": 2000,
+    "address": "Jalan Duta, 50480 Kuala Lumpur"
+  }
+]

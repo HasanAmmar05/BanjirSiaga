@@ -1,0 +1,51 @@
+{
+  "event_name": "December 2024 KL Flash Flood",
+  "event_date": "2024-12-04",
+  "description": "Severe flash flooding across KL and Selangor caused by intense rainfall exceeding 100mm in 3 hours",
+  "location": {
+    "name": "Wangsa Maju, Kuala Lumpur",
+    "lat": 3.1850,
+    "lon": 101.7369
+  },
+  "weather_data": {
+    "current_rain_mm": 42.5,
+    "precipitation_last_hour_mm": 38.2,
+    "precipitation_probability_3hr": 95,
+    "temperature_c": 27.3,
+    "humidity_pct": 98,
+    "wind_speed_kmh": 22,
+    "cloud_cover_pct": 100,
+    "description": "Torrential rain with thunderstorm"
+  },
+  "warnings": [
+    {
+      "title_bm": "Amaran Cuaca Buruk: Hujan Sangat Lebat",
+      "title_en": "Severe Weather Warning: Very Heavy Rain",
+      "description_bm": "Hujan sangat lebat dijangka di Kuala Lumpur, Selangor, dan Putrajaya. Risiko banjir kilat tinggi di kawasan rendah.",
+      "description_en": "Very heavy rain expected in Kuala Lumpur, Selangor, and Putrajaya. High flash flood risk in low-lying areas.",
+      "valid_from": "2024-12-04T14:00:00+08:00",
+      "valid_to": "2024-12-04T23:00:00+08:00",
+      "severity": "DANGER"
+    },
+    {
+      "title_bm": "Amaran Banjir: Sg Gombak",
+      "title_en": "Flood Warning: Sg Gombak",
+      "description_bm": "Paras air Sg Gombak di stesen Wangsa Maju telah melepasi paras bahaya. Penduduk diminta berpindah segera.",
+      "description_en": "Water level at Sg Gombak Wangsa Maju station has exceeded danger level. Residents are urged to evacuate immediately.",
+      "valid_from": "2024-12-04T16:30:00+08:00",
+      "valid_to": "2024-12-05T06:00:00+08:00",
+      "severity": "DANGER"
+    }
+  ],
+  "river_levels": {
+    "sg_gombak_wangsa_maju": {
+      "name": "Sg Gombak @ Wangsa Maju",
+      "current_level_m": 4.85,
+      "normal_m": 1.20,
+      "alert_m": 2.80,
+      "warning_m": 3.50,
+      "danger_m": 4.20,
+      "status": "DANGER"
+    }
+  }
+}

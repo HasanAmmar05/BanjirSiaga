@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BanjirSiaga — AI Flood Intelligence for Malaysia</title>
+    <meta name="description" content="AI-powered hyper-local flood risk assessment for every Malaysian. Built with Gemini AI, Open-Meteo and data.gov.my.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #030712;
+            color: #e2e8f0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        .font-space { font-family: 'Space Grotesk', sans-serif; }
+
+        /* ─── Animated Background ─── */
+        .bg-grid {
+            position: fixed; inset: 0; z-index: 0;
+            background-image:
+                linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        .bg-glow {
+            position: fixed; z-index: 0;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            animation: float 15s ease-in-out infinite;
+        }
+        .bg-glow-1 { background: #3b82f6; top: -200px; left: -200px; }
+        .bg-glow-2 { background: #f97316; bottom: -200px; right: -200px; animation-delay: -7s; }
+        .bg-glow-3 { background: #06b6d4; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -3s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* ─── Rain Particle Canvas ─── */
+        #rain-canvas {
+            position: fixed; inset: 0; z-index: 1;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        /* ─── Glass Cards ─── */
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            border-radius: 16px;
+        }
+        .glass-strong {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 20px;
+        }
+
+        /* ─── Animated Gradient Text ─── */
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #38bdf8 25%, #818cf8 50%, #c084fc 75%, #60a5fa 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 4s linear infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* ─── Pulse ring ─── */
+        .pulse-ring {
+            position: relative;
+        }
+        .pulse-ring::before, .pulse-ring::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: inherit;
+            border: 2px solid rgba(59, 130, 246, 0.4);
+            animation: pulse-expand 2s ease-out infinite;
+        }
+        .pulse-ring::after { animation-delay: 1s; }
+        @keyframes pulse-expand {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.15); opacity: 0; }
+        }
+
+        /* ─── CTA Button ─── */
+        .cta-btn {
+            position: relative;
+            background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6);
+            padding: 16px 40px;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
+            border: none;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(59,130,246,0.3), 0 0 60px rgba(99,102,241,0.1);
+        }
+        .cta-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 0 40px rgba(59,130,246,0.5), 0 0 80px rgba(99,102,241,0.2);
+        }
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: btn-shine 3s ease-in-out infinite;
+        }
+        @keyframes btn-shine {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        /* ─── Risk Level Badges ─── */
+        .badge-selamat {
+            background: linear-gradient(135deg, #059669, #10b981, #34d399);
+            box-shadow: 0 0 30px rgba(16,185,129,0.3);
+        }
+        .badge-waspada {
+            background: linear-gradient(135deg, #d97706, #f59e0b, #fbbf24);
+            box-shadow: 0 0 30px rgba(245,158,11,0.3);
+        }
+        .badge-bahaya {
+            background: linear-gradient(135deg, #dc2626, #ef4444, #f87171);
+            box-shadow: 0 0 30px rgba(239,68,68,0.3);
+            animation: danger-pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes danger-pulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(239,68,68,0.3); }
+            50% { box-shadow: 0 0 50px rgba(239,68,68,0.5), 0 0 80px rgba(239,68,68,0.2); }
+        }
+
+        /* ─── Stat Counter ─── */
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(59,130,246,0.4);
+            box-shadow: 0 8px 30px rgba(59,130,246,0.1);
+        }
+
+        /* ─── Loading Steps ─── */
+        .loading-step {
+            transition: all 0.5s ease;
+        }
+        .loading-step.active .step-icon {
+            color: #60a5fa;
+            animation: spin 1s linear infinite;
+        }
+        .loading-step.done .step-icon {
+            color: #34d399;
+        }
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ─── Screen transitions ─── */
+        .screen { display: none; animation: fadeSlideIn 0.5s ease-out; }
+        .screen.active { display: block; }
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Typing effect ─── */
+        .typewriter { overflow: hidden; white-space: nowrap; border-right: 2px solid #60a5fa; animation: typing 2s steps(30) forwards, blink 0.8s step-end infinite; }
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink { 50% { border-color: transparent } }
+
+        /* ─── Feature Cards ─── */
+        .feature-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .feature-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(59,130,246,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 40px rgba(59,130,246,0.1);
+        }
+
+        /* ─── Map ─── */
+        #map { border-radius: 12px; z-index: 5; }
+        .leaflet-container { background: #0f172a !important; }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.3); border-radius: 3px; }
+
+        /* ─── Drop zone ─── */
+        .drop-zone { border: 2px dashed rgba(59,130,246,0.3); transition: all 0.3s; }
+        .drop-zone.dragover { border-color: #3b82f6; background: rgba(59,130,246,0.05); }
+
+        /* ─── Evacuation pulse marker ─── */
+        .evac-marker { position: relative; }
+        .evac-marker::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 0;
+            transform: translateY(-50%);
+            width: 8px; height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: evac-ping 1.5s ease-out infinite;
+        }
+        @keyframes evac-ping {
+            0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+            100% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
+        }
+
+        /* ─── Replay badge ─── */
+        .replay-badge {
+            position: fixed; top: 16px; right: 16px; z-index: 100;
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            color: #000;
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            animation: danger-pulse 2s ease-in-out infinite;
+            display: none;
+        }
+        .replay-badge.visible { display: block; }
+
+        /* ─── Tech stack badges ─── */
+        .tech-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px;
+            background: rgba(59,130,246,0.08);
+            border: 1px solid rgba(59,130,246,0.2);
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #93c5fd;
+            transition: all 0.3s;
+        }
+        .tech-badge:hover { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.4); }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+    <canvas id="rain-canvas"></canvas>
+
+    <!-- Replay Mode Badge -->
+    <div id="replayBadge" class="replay-badge">⏮ REPLAY MODE — Dec 2024 KL Flood</div>
+
+    <div class="relative z-10 min-h-screen">
+
+    <!-- ═══════════════ SCREEN 1: LANDING ═══════════════ -->
+    <div id="screen-landing" class="screen active">
+        <div class="max-w-5xl mx-auto px-4 pt-8 pb-16">
+
+            <!-- Nav Bar -->
+            <nav class="flex items-center justify-between mb-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-xl font-bold">🌊</div>
+                    <span class="font-space font-bold text-lg">BanjirSiaga</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="tech-badge">🧠 Gemini AI</span>
+                    <span class="tech-badge hidden sm:inline-flex">📡 Open-Meteo</span>
+                    <span class="tech-badge hidden sm:inline-flex">🇲🇾 data.gov.my</span>
+                </div>
+            </nav>
+
+            <!-- Hero Section -->
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 glass px-4 py-2 rounded-full text-sm mb-8 animate-pulse">
+                    <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                    <span class="text-slate-300">Sistem Aktif • Memanantau 16 negeri</span>
+                </div>
+
+                <h1 class="font-space font-black text-5xl sm:text-7xl lg:text-8xl leading-tight mb-6">
+                    <span class="gradient-text">Banjir?</span><br>
+                    <span class="text-white">Kami Siaga.</span>
+                </h1>
+
+                <p class="text-slate-400 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+                    First-ever <strong class="text-blue-400">AI-powered</strong> hyper-local flood intelligence for Malaysia.
+                    Real-time data + Gemini reasoning = <strong class="text-blue-400">life-saving guidance</strong>, in BM & EN.
+                </p>
+
+                <!-- CTA -->
+                <button onclick="showScreen('screen-input')" class="cta-btn font-space text-lg mb-6">
+                    🔍 Semak Kawasan Saya / Check My Area
+                </button>
+
+                <!-- Replay Toggle -->
+                <div class="flex items-center justify-center gap-3 mt-6">
+                    <span class="text-sm text-slate-500">Live</span>
+                    <button id="replayToggle" onclick="toggleReplayMode()" class="relative w-14 h-7 rounded-full bg-slate-700 transition-all duration-300 cursor-pointer">
+                        <div id="replayDot" class="absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-all duration-300"></div>
+                    </button>
+                    <span class="text-sm text-slate-500">Replay: Dec 2024 KL Flood</span>
+                </div>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+                <div class="stat-card glass text-center p-5 rounded-2xl">
+                    <div class="text-3xl font-black text-red-400 font-space" id="stat1">RM145M</div>
+                    <div class="text-xs text-slate-400 mt-1">Spent on flood warnings</div>
+                </div>
+                <div class="stat-card glass text-center p-5 rounded-2xl">
+                    <div class="text-3xl font-black text-amber-400 font-space">5.6%</div>
+                    <div class="text-xs text-slate-400 mt-1">Forecast accuracy</div>
+                </div>
+                <div class="stat-card glass text-center p-5 rounded-2xl">
+                    <div class="text-3xl font-black text-blue-400 font-space">69.8%</div>
+                    <div class="text-xs text-slate-400 mt-1">Never heard of warnings</div>
+                </div>
+                <div class="stat-card glass text-center p-5 rounded-2xl">
+                    <div class="text-3xl font-black text-green-400 font-space">16</div>
+                    <div class="text-xs text-slate-400 mt-1">States monitored</div>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="grid md:grid-cols-3 gap-4 mb-16">
+                <div class="feature-card glass p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">🧠</div>
+                    <h3 class="font-space font-bold text-lg mb-2">Gemini AI Reasoning</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Multi-source data fusion — weather, sensors, history — reasoned through Gemini 2.0 Flash for human-readable risk assessments in BM & EN.</p>
+                </div>
+                <div class="feature-card glass p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">📸</div>
+                    <h3 class="font-space font-bold text-lg mb-2">Multimodal Vision</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Upload a photo and Gemini Vision estimates flood depth, identifies hazards, and provides instant BM/EN guidance.</p>
+                </div>
+                <div class="feature-card glass p-6 rounded-2xl">
+                    <div class="text-3xl mb-3">⏱️</div>
+                    <h3 class="font-space font-bold text-lg mb-2">Scenario Replay</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Replay the devastating Dec 2024 Kelantan flood with cached sensor data — perfect for planning, training, and research.</p>
+                </div>
+            </div>
+
+            <!-- How It Works -->
+            <div class="glass-strong p-8 rounded-3xl mb-16">
+                <h2 class="font-space font-bold text-2xl text-center mb-8 gradient-text">How It Works</h2>
+                <div class="grid md:grid-cols-4 gap-6">
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-xl mx-auto mb-3">📍</div>
+                        <div class="font-space font-bold text-sm">1. Enter Location</div>
+                        <p class="text-xs text-slate-500 mt-1">Postcode, place name, or pin on map</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-xl mx-auto mb-3">📡</div>
+                        <div class="font-space font-bold text-sm">2. Fuse Live Data</div>
+                        <p class="text-xs text-slate-500 mt-1">Open-Meteo weather + govt warnings</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-xl mx-auto mb-3">🧠</div>
+                        <div class="font-space font-bold text-sm">3. Gemini Reasons</div>
+                        <p class="text-xs text-slate-500 mt-1">AI analyzes risk with context + history</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center text-xl mx-auto mb-3">🛡️</div>
+                        <div class="font-space font-bold text-sm">4. Get Guidance</div>
+                        <p class="text-xs text-slate-500 mt-1">Risk level + actions in BM & EN</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="text-center text-sm text-slate-600">
+                <p>🏗 Built with Gemini AI for the <strong>Build with AI Hackathon</strong> by <strong>GDGKL × DeepMind</strong></p>
+                <p class="mt-1">Data: Open-Meteo • data.gov.my • Historical flood records</p>
+            </footer>
+        </div>
+    </div>
+
+    <!-- ═══════════════ SCREEN 2: LOCATION INPUT ═══════════════ -->
+    <div id="screen-input" class="screen">
+        <div class="max-w-3xl mx-auto px-4 pt-8 pb-16">
+            <button onclick="showScreen('screen-landing')" class="flex items-center gap-2 text-slate-400 hover:text-white transition mb-8 text-sm">
+                ← Kembali / Back
+            </button>
+
+            <div class="text-center mb-8">
+                <h2 class="font-space font-bold text-3xl mb-2">📍 Masukkan Lokasi Anda</h2>
+                <p class="text-slate-400">Enter your location for a hyper-local flood risk assessment</p>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="glass-strong p-2 rounded-2xl flex gap-2 mb-6">
+                <input id="locationInput" type="text" placeholder="e.g. Wangsa Maju, 53300, Ampang..."
+                    class="flex-1 bg-transparent px-4 py-3 text-white outline-none placeholder-slate-500 font-medium" />
+                <button onclick="submitAssessment()" id="submitBtn"
+                    class="cta-btn px-8 py-3 rounded-xl text-base whitespace-nowrap">
+                    🔍 Semak
+                </button>
+            </div>
+
+            <!-- Quick Search -->
+            <div class="flex flex-wrap gap-2 justify-center mb-8">
+                <button onclick="quickSearch('Wangsa Maju')" class="glass px-4 py-2 rounded-xl text-sm hover:border-blue-500/50 transition">📍 Wangsa Maju</button>
+                <button onclick="quickSearch('Ampang')" class="glass px-4 py-2 rounded-xl text-sm hover:border-blue-500/50 transition">📍 Ampang</button>
+                <button onclick="quickSearch('Shah Alam')" class="glass px-4 py-2 rounded-xl text-sm hover:border-blue-500/50 transition">📍 Shah Alam</button>
+                <button onclick="quickSearch('Kota Bharu')" class="glass px-4 py-2 rounded-xl text-sm hover:border-blue-500/50 transition">📍 Kota Bharu</button>
+                <button onclick="quickSearch('Georgetown')" class="glass px-4 py-2 rounded-xl text-sm hover:border-blue-500/50 transition">📍 Georgetown</button>
+            </div>
+
+            <!-- Map -->
+            <div class="glass-strong p-3 rounded-2xl">
+                <div id="map" style="height: 300px; width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ SCREEN 3: LOADING ═══════════════ -->
+    <div id="screen-loading" class="screen">
+        <div class="max-w-md mx-auto px-4 flex flex-col items-center justify-center min-h-screen">
+            <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-4xl mb-8 pulse-ring">
+                🌊
+            </div>
+            <h2 class="font-space font-bold text-2xl mb-2 text-center">Menganalisa...</h2>
+            <p class="text-slate-400 text-sm mb-10 text-center" id="loadingLocation">Wangsa Maju</p>
+
+            <div class="w-full space-y-4">
+                <div id="step1" class="loading-step glass p-4 rounded-xl flex items-center gap-4">
+                    <span class="step-icon text-xl">⏳</span>
+                    <div>
+                        <div class="font-medium text-sm">Mengambil data cuaca terkini</div>
+                        <div class="text-xs text-slate-500">Fetching live weather data...</div>
+                    </div>
+                </div>
+                <div id="step2" class="loading-step glass p-4 rounded-xl flex items-center gap-4 opacity-40">
+                    <span class="step-icon text-xl">⏳</span>
+                    <div>
+                        <div class="font-medium text-sm">Memeriksa amaran rasmi</div>
+                        <div class="text-xs text-slate-500">Checking official govt warnings...</div>
+                    </div>
+                </div>
+                <div id="step3" class="loading-step glass p-4 rounded-xl flex items-center gap-4 opacity-40">
+                    <span class="step-icon text-xl">⏳</span>
+                    <div>
+                        <div class="font-medium text-sm">AI menganalisa risiko banjir</div>
+                        <div class="text-xs text-slate-500">Gemini reasoning over all data...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ SCREEN 4: RESULT ═══════════════ -->
+    <div id="screen-result" class="screen">
+        <div class="max-w-3xl mx-auto px-4 pt-8 pb-16">
+            <button onclick="showScreen('screen-input')" class="flex items-center gap-2 text-slate-400 hover:text-white transition mb-6 text-sm">
+                ← Semak Tempat Lain / Check Another
+            </button>
+
+            <!-- Location Header -->
+            <div class="mb-6">
+                <h2 class="font-space font-bold text-2xl" id="resultLocation">📍 Location</h2>
+                <p class="text-slate-500 text-sm" id="resultTimestamp"></p>
+            </div>
+
+            <!-- Risk Badge -->
+            <div id="riskBadge" class="rounded-2xl p-8 text-center mb-6">
+                <div class="text-4xl mb-2" id="riskIcon">⚠️</div>
+                <div class="font-space font-black text-4xl text-white mb-1" id="riskLevel">WASPADA</div>
+                <div class="text-white/80 text-sm" id="riskSubtext">Berhati-hati — Risiko sederhana</div>
+            </div>
+
+            <!-- Weather Data -->
+            <div class="glass p-5 rounded-2xl mb-4">
+                <div class="text-xs font-bold text-slate-400 tracking-widest mb-3">DATA CUACA SEMASA</div>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                        <div class="text-2xl font-black text-cyan-400 font-space" id="wxRain">0mm</div>
+                        <div class="text-xs text-slate-500">Hujan / Rain</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-black text-blue-400 font-space" id="wxHumidity">0%</div>
+                        <div class="text-xs text-slate-500">Kelembapan</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-black text-purple-400 font-space" id="wxWind">0km/h</div>
+                        <div class="text-xs text-slate-500">Angin / Wind</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BM Assessment -->
+            <div class="glass p-5 rounded-2xl mb-4 border-l-4 border-blue-500">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-xs font-bold text-blue-400">🇲🇾 BAHASA MALAYSIA</span>
+                </div>
+                <p class="text-slate-200 leading-relaxed" id="assessBM"></p>
+            </div>
+
+            <!-- EN Assessment -->
+            <div class="glass p-5 rounded-2xl mb-6 border-l-4 border-indigo-500">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-xs font-bold text-indigo-400">🇬🇧 ENGLISH</span>
+                </div>
+                <p class="text-slate-200 leading-relaxed" id="assessEN"></p>
+            </div>
+
+            <!-- Immediate Actions -->
+            <div class="mb-6" id="actionsSection">
+                <div class="text-xs font-bold text-amber-400 tracking-widest mb-3">⚡ TINDAKAN SEGERA / IMMEDIATE ACTIONS</div>
+                <div class="flex flex-wrap gap-2" id="actionsList"></div>
+            </div>
+
+            <!-- Evacuation Centres -->
+            <div id="evacSection" class="mb-6" style="display:none;">
+                <div class="text-xs font-bold text-red-400 tracking-widest mb-3">🏫 PUSAT PEMINDAHAN TERDEKAT / NEAREST EVACUATION CENTRES</div>
+                <div class="space-y-3" id="evacList"></div>
+            </div>
+
+            <!-- Photo Upload CTA -->
+            <button onclick="showScreen('screen-photo')" class="w-full glass-strong p-4 rounded-2xl text-center hover:border-blue-500/50 transition font-space font-bold">
+                📸 Muat Naik Gambar Banjir / Upload Flood Photo
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════ SCREEN 5: PHOTO UPLOAD ═══════════════ -->
+    <div id="screen-photo" class="screen">
+        <div class="max-w-3xl mx-auto px-4 pt-8 pb-16">
+            <button onclick="goBackFromPhoto()" class="flex items-center gap-2 text-slate-400 hover:text-white transition mb-8 text-sm">
+                ← Kembali / Back
+            </button>
+
+            <div class="text-center mb-8">
+                <h2 class="font-space font-bold text-3xl mb-2">📸 Analisis Foto Banjir</h2>
+                <p class="text-slate-400">Upload a flood photo — Gemini Vision will estimate depth, identify hazards, and assess risk</p>
+            </div>
+
+            <div id="dropZone" class="drop-zone glass-strong p-12 rounded-2xl text-center cursor-pointer mb-6"
+                 onclick="document.getElementById('fileInput').click()">
+                <div class="text-5xl mb-4">📤</div>
+                <p class="font-space font-bold text-lg mb-2">Seret & Lepas / Drag & Drop</p>
+                <p class="text-slate-400 text-sm">or click to browse • JPG, PNG, WebP • Max 10MB</p>
+                <input id="fileInput" type="file" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)">
+            </div>
+
+            <!-- Photo Preview -->
+            <div id="photoPreview" class="glass-strong rounded-2xl overflow-hidden mb-6" style="display:none;">
+                <img id="previewImg" class="w-full max-h-64 object-cover" />
+                <div class="p-4">
+                    <button onclick="analyzePhoto()" id="analyzeBtn" class="cta-btn w-full py-3 rounded-xl text-base font-space">
+                        🧠 Analisa dengan Gemini Vision
+                    </button>
+                </div>
+            </div>
+
+            <!-- Photo Result -->
+            <div id="photoResult" class="glass-strong p-6 rounded-2xl" style="display:none;">
+                <div id="photoRiskBadge" class="rounded-2xl p-6 text-center mb-4">
+                    <div class="text-3xl mb-1" id="photoRiskIcon">⚠️</div>
+                    <div class="font-space font-black text-3xl text-white" id="photoRiskLevel">WASPADA</div>
+                </div>
+                <div class="glass p-4 rounded-xl mb-3 text-center">
+                    <div class="text-xs font-bold text-slate-400 tracking-widest mb-1">📏 ANGGARAN KEDALAMAN / DEPTH ESTIMATE</div>
+                    <div class="text-xl font-black text-cyan-400 font-space" id="photoDepth">~15cm</div>
+                </div>
+                <div class="glass p-4 rounded-xl mb-3 border-l-4 border-blue-500">
+                    <span class="text-xs font-bold text-blue-400">🇲🇾 BM</span>
+                    <p class="text-slate-200 mt-2 leading-relaxed" id="photoBM"></p>
+                </div>
+                <div class="glass p-4 rounded-xl mb-3 border-l-4 border-indigo-500">
+                    <span class="text-xs font-bold text-indigo-400">🇬🇧 EN</span>
+                    <p class="text-slate-200 mt-2 leading-relaxed" id="photoEN"></p>
+                </div>
+                <div class="glass p-4 rounded-xl border-l-4 border-amber-500">
+                    <span class="text-xs font-bold text-amber-400">⚡ TINDAKAN / ACTION</span>
+                    <p class="text-slate-200 mt-2" id="photoAction"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div><!-- /relative z-10 -->
+
+    <script>
+    // ─── State ───
+    let currentMode = 'live';
+    let map = null;
+    let marker = null;
+    let selectedLat = null;
+    let selectedLon = null;
+    let uploadedFile = null;
+
+    // ─── Rain Particle Effect ───
+    const canvas = document.getElementById('rain-canvas');
+    const ctx = canvas.getContext('2d');
+    let drops = [];
+    function initRain() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        drops = Array.from({length: 100}, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            len: Math.random() * 15 + 5,
+            speed: Math.random() * 3 + 2,
+            opacity: Math.random() * 0.3 + 0.1
+        }));
+    }
+    function drawRain() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drops.forEach(d => {
+            ctx.beginPath();
+            ctx.moveTo(d.x, d.y);
+            ctx.lineTo(d.x + 0.5, d.y + d.len);
+            ctx.strokeStyle = `rgba(96, 165, 250, ${d.opacity})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            d.y += d.speed;
+            if (d.y > canvas.height) { d.y = -d.len; d.x = Math.random() * canvas.width; }
+        });
+        requestAnimationFrame(drawRain);
+    }
+    initRain();
+    drawRain();
+    window.addEventListener('resize', initRain);
+
+    // ─── Screen Management ───
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+        if (screenId === 'screen-input' && !map) { initMap(); }
+        window.scrollTo(0, 0);
+    }
+
+    // ─── Map ───
+    function initMap() {
+        setTimeout(() => {
+            map = L.map('map').setView([3.15, 101.71], 11);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© CartoDB',
+                maxZoom: 19
+            }).addTo(map);
+            map.on('click', (e) => {
+                selectedLat = e.latlng.lat;
+                selectedLon = e.latlng.lng;
+                if (marker) map.removeLayer(marker);
+                marker = L.marker(e.latlng).addTo(map);
+                document.getElementById('locationInput').value = `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
+            });
+        }, 100);
+    }
+
+    // ─── Replay Mode ───
+    function toggleReplayMode() {
+        currentMode = currentMode === 'live' ? 'replay' : 'live';
+        const dot = document.getElementById('replayDot');
+        const toggle = document.getElementById('replayToggle');
+        const badge = document.getElementById('replayBadge');
+        if (currentMode === 'replay') {
+            dot.style.left = '32px';
+            toggle.style.background = 'linear-gradient(135deg, #d97706, #f59e0b)';
+            badge.classList.add('visible');
+        } else {
+            dot.style.left = '4px';
+            toggle.style.background = '#334155';
+            badge.classList.remove('visible');
+        }
+    }
+
+    // ─── Quick Search ───
+    function quickSearch(place) {
+        document.getElementById('locationInput').value = place;
+        selectedLat = null;
+        selectedLon = null;
+    }
+
+    // ─── Submit Assessment ───
+    async function submitAssessment() {
+        const location = document.getElementById('locationInput').value.trim();
+        if (!location) { alert('Sila masukkan lokasi / Please enter a location'); return; }
+
+        showScreen('screen-loading');
+        document.getElementById('loadingLocation').textContent = location;
+
+        // Animate loading steps
+        const steps = ['step1', 'step2', 'step3'];
+        for (let i = 0; i < steps.length; i++) {
+            await new Promise(r => setTimeout(r, 600));
+            const el = document.getElementById(steps[i]);
+            el.style.opacity = '1';
+            el.classList.add('active');
+            el.querySelector('.step-icon').textContent = '🔄';
+            if (i > 0) {
+                const prev = document.getElementById(steps[i-1]);
+                prev.classList.remove('active');
+                prev.classList.add('done');
+                prev.querySelector('.step-icon').textContent = '✅';
+            }
+        }
+
+        try {
+            const payload = { location, mode: currentMode };
+            if (selectedLat) { payload.lat = selectedLat; payload.lon = selectedLon; }
+            const resp = await fetch('/api/assess', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!resp.ok) {
+                const err = await resp.json();
+                throw new Error(err.detail || 'Server error');
+            }
+            const data = await resp.json();
+            // Mark last step done
+            document.getElementById('step3').classList.remove('active');
+            document.getElementById('step3').classList.add('done');
+            document.getElementById('step3').querySelector('.step-icon').textContent = '✅';
+            await new Promise(r => setTimeout(r, 400));
+            renderResult(data);
+        } catch (e) {
+            alert('❌ Ralat: ' + e.message);
+            showScreen('screen-input');
+        }
+
+        // Reset loading steps
+        steps.forEach(s => {
+            const el = document.getElementById(s);
+            el.style.opacity = s === 'step1' ? '1' : '0.4';
+            el.classList.remove('active', 'done');
+            el.querySelector('.step-icon').textContent = '⏳';
+        });
+    }
+
+    // ─── Render Result ───
+    function renderResult(data) {
+        const locShort = (data.location || '').split(',').slice(0, 2).join(',');
+        document.getElementById('resultLocation').textContent = '📍 ' + locShort;
+        document.getElementById('resultTimestamp').textContent = new Date().toLocaleString('ms-MY', { dateStyle: 'short', timeStyle: 'medium' }) + ' MYT';
+
+        const risk = (data.risk_level || 'WASPADA').toUpperCase();
+        const badge = document.getElementById('riskBadge');
+        const riskConfig = {
+            'SELAMAT': { cls: 'badge-selamat', icon: '✅', sub: 'Selamat — Risiko rendah' },
+            'WASPADA': { cls: 'badge-waspada', icon: '⚠️', sub: 'Berhati-hati — Risiko sederhana' },
+            'BAHAYA': { cls: 'badge-bahaya', icon: '🚨', sub: 'Bahaya! — Risiko tinggi banjir' },
+        };
+        const cfg = riskConfig[risk] || riskConfig['WASPADA'];
+        badge.className = `rounded-2xl p-8 text-center mb-6 ${cfg.cls}`;
+        document.getElementById('riskIcon').textContent = cfg.icon;
+        document.getElementById('riskLevel').textContent = risk;
+        document.getElementById('riskSubtext').textContent = cfg.sub;
+
+        // Weather
+        const wx = data.weather || {};
+        const rain = wx.current_rain_mm || 0;
+        document.getElementById('wxRain').textContent = rain + 'mm';
+        document.getElementById('wxHumidity').textContent = (wx.humidity_pct || 0) + '%';
+        document.getElementById('wxWind').textContent = (wx.wind_speed_kmh || 0) + 'km/h';
+
+        // Rain severity label
+        let rainLabel = 'Tiada Hujan';
+        if (rain > 30) rainLabel = 'Hujan Sangat Lebat';
+        else if (rain > 15) rainLabel = 'Hujan Lebat';
+        else if (rain > 5) rainLabel = 'Hujan Sederhana';
+        else if (rain > 0) rainLabel = 'Hujan Renyai';
+
+        // Assessments
+        document.getElementById('assessBM').textContent = data.bm || 'Tiada maklumat';
+        document.getElementById('assessEN').textContent = data.en || 'No information available';
+
+        // Actions
+        const actionsList = document.getElementById('actionsList');
+        actionsList.innerHTML = '';
+        (data.immediate_actions || []).forEach(a => {
+            const chip = document.createElement('span');
+            chip.className = 'glass px-4 py-2 rounded-xl text-sm flex items-center gap-2';
+            chip.innerHTML = `⚡ ${a}`;
+            actionsList.appendChild(chip);
+        });
+
+        // Evac centres
+        const evacSection = document.getElementById('evacSection');
+        const evacList = document.getElementById('evacList');
+        evacList.innerHTML = '';
+        if (data.evacuation_centres && data.evacuation_centres.length > 0) {
+            evacSection.style.display = 'block';
+            data.evacuation_centres.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'glass p-4 rounded-xl flex items-start gap-4 evac-marker';
+                card.innerHTML = `
+                    <div class="pl-5">
+                        <div class="font-space font-bold">${c.name}</div>
+                        <div class="text-xs text-slate-400">${c.address}</div>
+                        <div class="flex gap-4 mt-1">
+                            <span class="text-xs text-cyan-400">📍 ${c.distance_km} km</span>
+                            <span class="text-xs text-slate-400">👥 Kapasiti: ${c.capacity}</span>
+                        </div>
+                    </div>`;
+                evacList.appendChild(card);
+            });
+        } else {
+            evacSection.style.display = 'none';
+        }
+
+        showScreen('screen-result');
+    }
+
+    // ─── Photo Upload ───
+    const dropZone = document.getElementById('dropZone');
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) handlePhotoFile(e.dataTransfer.files[0]);
+    });
+
+    function handlePhotoUpload(e) { if (e.target.files.length) handlePhotoFile(e.target.files[0]); }
+
+    function handlePhotoFile(file) {
+        uploadedFile = file;
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('previewImg').src = e.target.result;
+            document.getElementById('photoPreview').style.display = 'block';
+            document.getElementById('dropZone').style.display = 'none';
+            document.getElementById('photoResult').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function analyzePhoto() {
+        if (!uploadedFile) return;
+        const btn = document.getElementById('analyzeBtn');
+        btn.textContent = '🔄 Menganalisa...';
+        btn.disabled = true;
+
+        const formData = new FormData();
+        formData.append('file', uploadedFile);
+        formData.append('location', document.getElementById('locationInput')?.value || 'Kuala Lumpur');
+
+        try {
+            const resp = await fetch('/api/photo', { method: 'POST', body: formData });
+            if (!resp.ok) { const err = await resp.json(); throw new Error(err.detail || 'Error'); }
+            const data = await resp.json();
+            renderPhotoResult(data);
+        } catch (e) {
+            alert('❌ ' + e.message);
+        }
+        btn.textContent = '🧠 Analisa dengan Gemini Vision';
+        btn.disabled = false;
+    }
+
+    function renderPhotoResult(data) {
+        const risk = (data.risk_level || 'WASPADA').toUpperCase();
+        const riskConfig = {
+            'SELAMAT': { cls: 'badge-selamat', icon: '✅' },
+            'WASPADA': { cls: 'badge-waspada', icon: '⚠️' },
+            'BAHAYA': { cls: 'badge-bahaya', icon: '🚨' },
+        };
+        const cfg = riskConfig[risk] || riskConfig['WASPADA'];
+        document.getElementById('photoRiskBadge').className = `rounded-2xl p-6 text-center mb-4 ${cfg.cls}`;
+        document.getElementById('photoRiskIcon').textContent = cfg.icon;
+        document.getElementById('photoRiskLevel').textContent = risk;
+        document.getElementById('photoDepth').textContent = data.depth_estimate || 'N/A';
+        document.getElementById('photoBM').textContent = data.bm || '';
+        document.getElementById('photoEN').textContent = data.en || '';
+        document.getElementById('photoAction').textContent = data.action || '';
+        document.getElementById('photoResult').style.display = 'block';
+    }
+
+    function goBackFromPhoto() {
+        // Reset photo state
+        document.getElementById('photoPreview').style.display = 'none';
+        document.getElementById('photoResult').style.display = 'none';
+        document.getElementById('dropZone').style.display = 'block';
+        uploadedFile = null;
+        showScreen('screen-result');
+    }
+
+    // ─── Enter key ───
+    document.getElementById('locationInput')?.addEventListener('keydown', e => {
+        if (e.key === 'Enter') submitAssessment();
+    });
+    </script>
+</body>
+</html>

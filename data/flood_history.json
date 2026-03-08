@@ -1,0 +1,252 @@
+{
+  "wangsa_maju": {
+    "area_name": "Wangsa Maju",
+    "postcode": "53300",
+    "risk_rating": "high",
+    "events": [
+      {
+        "date": "2024-12-04",
+        "severity": "major",
+        "rainfall_mm": 120,
+        "affected_streets": ["Jalan Wangsa Delima", "Jalan Wangsa Perdana", "Persiaran Wangsa Baiduri"],
+        "water_depth_cm": 60,
+        "duration_hours": 8,
+        "notes": "Flash flood triggered by sudden downpour; multiple vehicles submerged at Jalan Wangsa Delima underpass"
+      },
+      {
+        "date": "2023-11-18",
+        "severity": "moderate",
+        "rainfall_mm": 85,
+        "affected_streets": ["Jalan Wangsa Delima", "Taman Sri Rampai"],
+        "water_depth_cm": 30,
+        "duration_hours": 4,
+        "notes": "Drainage overflow near Sri Rampai LRT station"
+      },
+      {
+        "date": "2021-12-18",
+        "severity": "catastrophic",
+        "rainfall_mm": 150,
+        "affected_streets": ["All major roads in Wangsa Maju", "Taman Sri Rampai", "Wangsa Perdana"],
+        "water_depth_cm": 120,
+        "duration_hours": 24,
+        "notes": "Part of the great KL flood of December 2021; Sg Gombak overflowed"
+      }
+    ]
+  },
+  "ampang": {
+    "area_name": "Ampang",
+    "postcode": "68000",
+    "risk_rating": "high",
+    "events": [
+      {
+        "date": "2024-12-04",
+        "severity": "major",
+        "rainfall_mm": 110,
+        "affected_streets": ["Jalan Ampang", "Jalan Memanda", "Taman Kosas"],
+        "water_depth_cm": 50,
+        "duration_hours": 6,
+        "notes": "Rapid water rise at Taman Kosas residential area; hundreds of cars submerged"
+      },
+      {
+        "date": "2023-09-08",
+        "severity": "moderate",
+        "rainfall_mm": 75,
+        "affected_streets": ["Jalan Ampang Hilir", "Kampung Berembang"],
+        "water_depth_cm": 25,
+        "duration_hours": 3,
+        "notes": "Localized flash flood near Ampang Point"
+      },
+      {
+        "date": "2021-12-18",
+        "severity": "catastrophic",
+        "rainfall_mm": 160,
+        "affected_streets": ["Entire Ampang Jaya affected", "Taman Kosas", "Pandan Indah"],
+        "water_depth_cm": 150,
+        "duration_hours": 36,
+        "notes": "Worst hit area in KL during Dec 2021 floods; Sg Ampang burst banks"
+      }
+    ]
+  },
+  "cheras": {
+    "area_name": "Cheras",
+    "postcode": "56000",
+    "risk_rating": "moderate",
+    "events": [
+      {
+        "date": "2024-09-24",
+        "severity": "moderate",
+        "rainfall_mm": 90,
+        "affected_streets": ["Taman Midah", "Jalan Cheras", "Taman Connaught"],
+        "water_depth_cm": 35,
+        "duration_hours": 5,
+        "notes": "Flash flood at Taman Midah roundabout; traffic paralyzed"
+      },
+      {
+        "date": "2021-12-18",
+        "severity": "major",
+        "rainfall_mm": 140,
+        "affected_streets": ["Taman Sri Bahtera", "Taman Segar", "Bandar Tun Hussein Onn"],
+        "water_depth_cm": 90,
+        "duration_hours": 12,
+        "notes": "Major flooding across Cheras corridor during Dec 2021"
+      }
+    ]
+  },
+  "setapak": {
+    "area_name": "Setapak",
+    "postcode": "53100",
+    "risk_rating": "moderate",
+    "events": [
+      {
+        "date": "2024-12-04",
+        "severity": "moderate",
+        "rainfall_mm": 95,
+        "affected_streets": ["Jalan Genting Kelang", "Taman Greenview", "Danau Kota"],
+        "water_depth_cm": 40,
+        "duration_hours": 5,
+        "notes": "Sg Gombak tributary overflow affecting low-lying areas"
+      },
+      {
+        "date": "2021-12-18",
+        "severity": "major",
+        "rainfall_mm": 130,
+        "affected_streets": ["Taman P. Ramlee", "Wangsa Melawati"],
+        "water_depth_cm": 80,
+        "duration_hours": 14,
+        "notes": "Severe flooding from Sg Gombak overflow"
+      }
+    ]
+  },
+  "bangsar": {
+    "area_name": "Bangsar",
+    "postcode": "59000",
+    "risk_rating": "low",
+    "events": [
+      {
+        "date": "2024-10-15",
+        "severity": "minor",
+        "rainfall_mm": 60,
+        "affected_streets": ["Jalan Maarof", "Lorong Maarof"],
+        "water_depth_cm": 10,
+        "duration_hours": 2,
+        "notes": "Minor ponding at Jalan Maarof due to blocked drains"
+      }
+    ]
+  },
+  "pandan_indah": {
+    "area_name": "Pandan Indah",
+    "postcode": "55100",
+    "risk_rating": "high",
+    "events": [
+      {
+        "date": "2024-12-04",
+        "severity": "major",
+        "rainfall_mm": 105,
+        "affected_streets": ["Jalan Pandan Indah", "Taman Pandan Mewah"],
+        "water_depth_cm": 55,
+        "duration_hours": 7,
+        "notes": "Sg Klang tributary overflow; ground floor houses inundated"
+      },
+      {
+        "date": "2021-12-18",
+        "severity": "catastrophic",
+        "rainfall_mm": 155,
+        "affected_streets": ["All of Pandan Indah residential"],
+        "water_depth_cm": 200,
+        "duration_hours": 48,
+        "notes": "Among the worst-affected areas; water reached second floor in some houses"
+      }
+    ]
+  },
+  "shah_alam": {
+    "area_name": "Shah Alam",
+    "postcode": "40000",
+    "risk_rating": "high",
+    "events": [
+      {
+        "date": "2024-12-04",
+        "severity": "moderate",
+        "rainfall_mm": 88,
+        "affected_streets": ["Seksyen 24", "Seksyen 25", "Persiaran Kayangan"],
+        "water_depth_cm": 30,
+        "duration_hours": 4,
+        "notes": "Flash flooding in low-lying sections near Sg Klang"
+      },
+      {
+        "date": "2021-12-18",
+        "severity": "catastrophic",
+        "rainfall_mm": 175,
+        "affected_streets": ["Seksyen 24-27", "Taman Sri Muda"],
+        "water_depth_cm": 300,
+        "duration_hours": 72,
+        "notes": "Taman Sri Muda became Malaysia's worst urban flood disaster; entire township submerged"
+      }
+    ]
+  },
+  "bukit_jalil": {
+    "area_name": "Bukit Jalil",
+    "postcode": "57000",
+    "risk_rating": "low",
+    "events": [
+      {
+        "date": "2024-06-12",
+        "severity": "minor",
+        "rainfall_mm": 55,
+        "affected_streets": ["Jalan Jalil Perkasa"],
+        "water_depth_cm": 8,
+        "duration_hours": 1,
+        "notes": "Brief ponding near Pavilion Bukit Jalil car park"
+      }
+    ]
+  },
+  "klcc": {
+    "area_name": "KLCC / Kampung Baru",
+    "postcode": "50088",
+    "risk_rating": "moderate",
+    "events": [
+      {
+        "date": "2024-11-20",
+        "severity": "moderate",
+        "rainfall_mm": 78,
+        "affected_streets": ["Jalan Raja Muda", "Kampung Baru", "Jalan Ampang near KLCC"],
+        "water_depth_cm": 25,
+        "duration_hours": 3,
+        "notes": "Flash flood at Kampung Baru and Jalan Raja Muda intersection"
+      },
+      {
+        "date": "2021-12-18",
+        "severity": "major",
+        "rainfall_mm": 135,
+        "affected_streets": ["Kampung Baru", "Jalan Tun Razak underpass"],
+        "water_depth_cm": 70,
+        "duration_hours": 8,
+        "notes": "Jalan Tun Razak underpass completely submerged; Kampung Baru low-lying areas flooded"
+      }
+    ]
+  },
+  "petaling_jaya": {
+    "area_name": "Petaling Jaya",
+    "postcode": "46000",
+    "risk_rating": "moderate",
+    "events": [
+      {
+        "date": "2024-10-03",
+        "severity": "moderate",
+        "rainfall_mm": 80,
+        "affected_streets": ["SS2", "Jalan University", "Taman SEA"],
+        "water_depth_cm": 20,
+        "duration_hours": 3,
+        "notes": "Flash flood at SS2 commercial area near the wet market"
+      },
+      {
+        "date": "2021-12-18",
+        "severity": "major",
+        "rainfall_mm": 125,
+        "affected_streets": ["Kota Damansara", "Taman Megah", "SS2"],
+        "water_depth_cm": 60,
+        "duration_hours": 10,
+        "notes": "Significant flooding in PJ due to Sg Damansara overflow"
+      }
+    ]
+  }
+}
